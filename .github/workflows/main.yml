@@ -29,22 +29,29 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Accept Android SDK licenses
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses again
+        run: |
+          yes | sdkmanager --licenses || true
 
       - name: Install dependencies
         run: npm install
 
-      - name: Verify app icon
+      - name: Verify and prepare app icon
         run: |
           ICON="$(find . -maxdepth 1 -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) | head -n 1)"
           if [ -z "$ICON" ]; then
-            echo "ERROR: No PNG or JPG app icon found in repository root."
+            echo "No app icon image found in repository root."
             exit 1
           fi
           mkdir -p assets
           cp "$ICON" assets/icon.png
-          echo "Using icon: $ICON"
 
       - name: Install Capacitor assets tool
         run: npm install --no-save @capacitor/assets
@@ -63,9 +70,6 @@ jobs:
           FILE="android/app/src/main/res/values/strings.xml"
           if [ -f "$FILE" ]; then
             sed -i 's/<string name="app_name">[^<]*<\/string>/<string name="app_name">مخزن ولاد شلبه<\/string>/' "$FILE"
-          else
-            mkdir -p android/app/src/main/res/values
-            printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>' '<resources>' '    <string name="app_name">مخزن ولاد شلبه</string>' '</resources>' > "$FILE"
           fi
 
       - name: Build APK
