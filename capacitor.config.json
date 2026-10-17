@@ -1,8 +1,7 @@
+
 {
-  "appId": "com.oladshalba.makhzan",
-  "appName": "مخزن أولاد شلبه",
+  "appId": "com.owladshalba.makhzan",
+  "appName": "مخزن ولاد شلبه",
   "webDir": "www",
-  "server": {
-    "androidScheme": "https"
-  }
+  "bundledWebRuntime": false
 }
