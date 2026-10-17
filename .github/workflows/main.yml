@@ -7,6 +7,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,11 +35,38 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Verify app icon
+        run: |
+          ICON="$(find . -maxdepth 1 -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) | head -n 1)"
+          if [ -z "$ICON" ]; then
+            echo "ERROR: No PNG or JPG app icon found in repository root."
+            exit 1
+          fi
+          mkdir -p assets
+          cp "$ICON" assets/icon.png
+          echo "Using icon: $ICON"
+
+      - name: Install Capacitor assets tool
+        run: npm install --no-save @capacitor/assets
+
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Generate Android icons
+        run: npx capacitor-assets generate --android
+
       - name: Sync Android project
         run: npx cap sync android
+
+      - name: Set Android app label
+        run: |
+          FILE="android/app/src/main/res/values/strings.xml"
+          if [ -f "$FILE" ]; then
+            sed -i 's/<string name="app_name">[^<]*<\/string>/<string name="app_name">مخزن ولاد شلبه<\/string>/' "$FILE"
+          else
+            mkdir -p android/app/src/main/res/values
+            printf '%s\n' '<?xml version="1.0" encoding="utf-8"?>' '<resources>' '    <string name="app_name">مخزن ولاد شلبه</string>' '</resources>' > "$FILE"
+          fi
 
       - name: Build APK
         working-directory: android
