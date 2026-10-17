@@ -1,0 +1,8 @@
+{
+  "appId": "com.oladshalba.makhzan",
+  "appName": "مخزن أولاد شلبه",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
