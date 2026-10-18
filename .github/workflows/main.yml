@@ -34,9 +34,9 @@ jobs:
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
-      - name: Install Android SDK packages
+      - name: Accept Android SDK licenses and install packages
         run: |
-          sdkmanager --licenses
+          yes | sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Install dependencies
@@ -64,11 +64,35 @@ jobs:
       - name: Sync Android project
         run: npx cap sync android
 
+      - name: Add notification permissions
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text(encoding="utf-8")
+
+          permissions = [
+              "android.permission.POST_NOTIFICATIONS",
+              "android.permission.SCHEDULE_EXACT_ALARM",
+          ]
+
+          for permission in permissions:
+              if permission not in s:
+                  entry = (
+                      f'    <uses-permission android:name="{permission}" />\n'
+                  )
+                  s = s.replace("<application", entry + "<application", 1)
+
+          p.write_text(s, encoding="utf-8")
+          print("Notification permissions configured.")
+          PY
+
       - name: Set app name
         run: |
           FILE="android/app/src/main/res/values/strings.xml"
           if [ -f "$FILE" ]; then
-            sed -i 's/<string name="app_name">[^<]*<\/string>/<string name="app_name">مخزن ولاد شلبه<\/string>/' "$FILE"
+            sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">مخزن ولاد شلبه</string>#' "$FILE"
           fi
 
       - name: Build APK
