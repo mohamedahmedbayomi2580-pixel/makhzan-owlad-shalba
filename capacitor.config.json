@@ -1,7 +1,5 @@
-
 {
   "appId": "com.owladshalba.makhzan",
-  "appName": "مخزن ولاد شلبه",
-  "webDir": "www",
-  "bundledWebRuntime": false
+  "appName": "مخزن اولاد شلبه",
+  "webDir": "www"
 }
