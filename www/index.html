@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>مستودع مواد البناء</title>
+<title>مخزن اولاد شلبه</title>
 <style>
 :root{--pg:#0b1f3a;--pt:#fff;--cd:#fff;--bd:#d1d5db;--tx:#1f2937;--mu:#6b7280;--ac:#f59e0b;--rd:#dc2626;--gn:#16a34a}
 [data-t=light]{--pg:#eef2f7;--pt:#0b1f3a}
@@ -35,7 +35,7 @@ pre{white-space:pre-wrap;font:inherit;margin:0}
 <path d="M18 100h94"/><rect x="22" y="48" width="30" height="52" fill="#13305c"/><rect x="56" y="64" width="26" height="36" fill="#13305c"/>
 <path d="M30 58h4M40 58h4M30 70h4M40 70h4M30 82h4M40 82h4M62 74h4M72 74h4M62 86h4M72 86h4" stroke="#fff" stroke-width="3"/>
 <path d="M96 100V14M96 14h-60M96 14l22 14M96 24l-40-10M48 14v22M48 36v4" /><path d="M44 40h8v6h-8z" fill="#f59e0b"/></svg>
-<h2 style="margin:0">مستودع مواد البناء</h2>
+<h2 style="margin:0">مخزن اولاد شلبه</h2>
 <div class="fm"><input id="lu" placeholder="اسم المستخدم" autocomplete="off"><input id="lp" type="password" placeholder="كلمة السر">
 <button class="b a" onclick="login()">تسجيل الدخول</button><div id="le" style="color:#fca5a5;text-align:center"></div></div></div>
 
@@ -56,8 +56,8 @@ const m=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2});
 const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const today=()=>fmt(new Date()),nextDay=s=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+1);return fmt(d)};
 const sum=(a,f)=>a.reduce((x,y)=>x+f(y),0);
-let db=JSON.parse(L.getItem('db')||'null')||{u:'admin',p:'123456789',t:'dark',shop:{n:'مستودع مواد البناء',ph:'',vat:0,low:10},prods:[],cust:[],sup:[],inv:[],pay:[],ret:[],hold:[],seq:1,lastBk:today(),sh:0};
-const save=()=>L.setItem('db',JSON.stringify(db));
+let db=JSON.parse(L.getItem('db')||'null')||{u:'admin',p:'123456789',t:'dark',shop:{n:'مخزن اولاد شلبه',ph:'',vat:0,low:10},prods:[],cust:[],sup:[],inv:[],pay:[],ret:[],hold:[],seq:1,lastBk:today(),sh:0};
+const save=()=>{const s=JSON.stringify(db);try{L.setItem('db',s)}catch(e){Object.keys(L).filter(k=>k.startsWith('bk_')||k=='db_prev').forEach(k=>L.removeItem(k));L.setItem('db',s)}};
 const val=id=>$('#'+id).value;
 let V='cash',cart=[],cf,ps='',rg=0,rd=today(),hq='',sb='c',rv=null,ok=0;
 const newCf=()=>cf={c:'',t:'cash',dt:'p',dv:0,fee:0,site:'',pd:0};newCf();
@@ -148,7 +148,7 @@ return card('📊 التقرير اليومي',`<input type="date" value="${rd}"
 /* ===== النسخ الاحتياطي والاستعادة ===== */
 function snap(day){return{day,at:Date.now(),shop:db.shop,prods:db.prods,cust:db.cust,sup:db.sup,inv:db.inv.filter(x=>x.day==day),pay:db.pay.filter(x=>x.day==day),ret:db.ret.filter(x=>x.day==day)}}
 async function perm(){try{const C=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem;if(C)await C.requestPermissions();else if(window.cordova&&cordova.plugins&&cordova.plugins.permissions){const P=cordova.plugins.permissions;P.requestPermission(P.WRITE_EXTERNAL_STORAGE,()=>{},()=>{})}}catch(e){}}
-async function toFile(day,j){const name='backup_'+day+'.json',dir='مستودع_مواد_البناء';
+async function toFile(day,j){const name='backup_'+day+'.json',dir='مخزن_اولاد_شلبه';
 try{const C=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem;
 if(C){await C.writeFile({path:dir+'/'+name,data:j,directory:'DOCUMENTS',encoding:'utf8',recursive:true});return 1}
 if(window.cordova&&cordova.file){await new Promise((o,n)=>resolveLocalFileSystemURL(cordova.file.externalRootDirectory,r=>r.getDirectory(dir,{create:true},d=>d.getFile(name,{create:true},f=>f.createWriter(w=>{w.onwriteend=o;w.onerror=n;w.write(new Blob([j]))},n),n),n),n));return 1}}catch(e){}return 0}
@@ -174,7 +174,7 @@ return `<div class="ro">👁️ عرض للقراءة فقط — يوم ${s.day}
 function vSet(){return card('🏪 بيانات المحل',`<input id="sn" value="${E(db.shop.n)}" placeholder="اسم المحل"><div class="g3"><input id="sp" value="${E(db.shop.ph)}" placeholder="الهاتف"><input id="sv" type="number" value="${db.shop.vat}" placeholder="الضريبة %"><input id="sl" type="number" value="${db.shop.low}" placeholder="حد التنبيه"></div><button class="b" onclick="saveShop()">حفظ</button>`)
 +card('🔑 حساب الدخول',`<input id="nu" placeholder="اسم المستخدم الجديد" value="${E(db.u)}"><input id="np" type="password" placeholder="كلمة السر الجديدة"><input id="op" type="password" placeholder="كلمة السر الحالية"><button class="b" onclick="saveAcc()">تغيير</button>`)
 +card('🌗 المظهر',`<div class="g2"><button class="b g" onclick="db.t='light';save();render()">☀️ فاتح</button><button class="b" onclick="db.t='dark';save();render()">🌙 غامق</button></div>`)
-+card('💾 النسخ الاحتياطي',`<p class="mu">نسخة تلقائية كل يوم الساعة 12 ليلاً في مجلد «مستودع_مواد_البناء». آخر يوم تم نسخه: ${db.lastBk==today()?'حتى أمس':db.lastBk}</p><button class="b a" onclick="perm()">منح إذن التخزين</button><button class="b" onclick="backup(today(),1).then(r=>alert(r?'تم الحفظ في المجلد':'تم التنزيل كملف'))">نسخ احتياطي الآن</button>`)
++card('💾 النسخ الاحتياطي',`<p class="mu">نسخة تلقائية كل يوم الساعة 12 ليلاً في مجلد «مخزن_اولاد_شلبه». آخر يوم تم نسخه: ${db.lastBk==today()?'حتى أمس':db.lastBk}</p><button class="b a" onclick="perm()">منح إذن التخزين</button>`)
 +tplCard()+card('🔒 إغلاق الوردية (Z)',`<button class="b r" onclick="zrep()">إغلاق الوردية وطباعة التقرير</button>`)}
 function saveShop(){db.shop={n:val('sn'),ph:val('sp'),vat:+val('sv')||0,low:+val('sl')||0};save();$('#hn').textContent=db.shop.n;alert('تم الحفظ')}
 function saveAcc(){if(val('op')!=db.p)return alert('كلمة السر الحالية غير صحيحة');if(!val('nu')||!val('np'))return alert('أكمل الحقول');db.u=val('nu');db.p=val('np');save();alert('تم التغيير')}
@@ -248,13 +248,13 @@ function alerts(){const a=[];db.rsv.forEach(r=>{if(r.q>r.drawn)a.push({d:r.exp,m
 db.cust.forEach(c=>{if(c.due&&c.bal>0)a.push({d:c.due,m:`💰 تنبيه سداد: يستحق غداً سداد دفعة من العميل ${c.n} بمبلغ ${m(c.bal)} $`})});return a}
 async function sched(show){const A=alerts(),N=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications,t=today(),n=nextDay(t);
 if(show===1){const l=A.filter(a=>a.d==t||a.d==n);if(l.length)modal('<h3>🔔 تنبيهات</h3>'+l.map(a=>`<div class="row">${E(a.m)}</div>`).join(''))}
-if(N){try{await N.requestPermissions();const p=await N.getPending();if(p.notifications.length)await N.cancel(p);let k=1;const L2=A.map(a=>({id:k++,title:'مستودع البناء',body:a.m,schedule:{at:new Date(new Date(a.d+'T09:00').getTime()-864e5),allowWhileIdle:true}})).filter(z=>z.schedule.at>new Date());if(L2.length)await N.schedule({notifications:L2})}catch(e){}}}
+if(N){try{await N.requestPermissions();const p=await N.getPending();if(p.notifications.length)await N.cancel(p);let k=1;const L2=A.map(a=>({id:k++,title:'مخزن اولاد شلبه',body:a.m,schedule:{at:new Date(new Date(a.d+'T09:00').getTime()-864e5),allowWhileIdle:true}})).filter(z=>z.schedule.at>new Date());if(L2.length)await N.schedule({notifications:L2})}catch(e){}}}
 setInterval(sched,36e5);
 
 /* --- القالب والطابعة والنسخ المشفر --- */
 function tplCard(){const T=db.tpl;return card('🎨 مصمم قالب الفاتورة',`<select id="tpa" onchange="tpl()"><option value="80">حراري 80mm</option><option value="A5">A5</option><option value="A4">A4</option></select><select id="tpf" onchange="tpl()"><option>Tahoma</option><option>Arial</option><option>Courier New</option><option>serif</option></select><input id="tph" placeholder="الهيدر" value="${E(T.head)}" oninput="tpl()"><input id="tpt" placeholder="شروط البيع" value="${E(T.terms)}" oninput="tpl()"><input id="tpb" placeholder="الفوتر" value="${E(T.foot)}" oninput="tpl()"><div class="mu">الشعار</div><input type="file" accept="image/*" onchange="logo(this.files[0])"><div id="tpv" style="overflow:auto;background:#f3f4f6;padding:6px;border-radius:10px"></div>`)
 +card('🧾 الطابعة الحرارية (ESC/POS)',`<div class="g3"><button class="b s" onclick="pair('bt')">Bluetooth</button><button class="b s" onclick="pair('usb')">USB</button><button class="b s" onclick="pair('wifi')">Wi-Fi</button></div><input id="pip" placeholder="IP الطابعة (للـ Wi-Fi)" style="margin-top:8px"><button class="b a" onclick="prn(db.inv[db.inv.length-1]||{id:1,ts:Date.now(),c:'',t:'cash',items:[],s:0,d:0,v:0,fee:0,tot:0,paid:0},1)">طباعة تجريبية</button>`)
-+card('🔐 نسخة احتياطية مشفرة',`<input id="bpw" type="password" placeholder="كلمة سر النسخة"><button class="b" onclick="exp()">💾 حفظ نسخة احتياطية إلى...</button><div class="mu">استرجاع نسخة (.bak)</div><input type="file" accept=".bak" onchange="imp(this.files[0])">`)}
++card('💾 النسخ الاحتياطي والاستعادة',`<p class="mu">يحفظ كل بيانات التطبيق (المنتجات، العملاء، الفواتير، الحجوزات، الإعدادات، القوالب) في ملف باسم «نسخة احتياطية» داخل مجلد المستندات، بدون كلمة سر.</p><button class="b" onclick="exp()">💾 حفظ نسخة احتياطية</button><button class="b a" onclick="$('#rf2').click()">♻️ استعادة نسخة</button><input id="rf2" type="file" style="display:none" onchange="imp(this.files[0]);this.value=''">`)}
 function tpInit(){$('#tpa').value=db.tpl.paper;$('#tpf').value=db.tpl.font;pvw()}
 function pvw(){const i=db.inv[db.inv.length-1]||{id:1,ts:Date.now(),c:'',t:'cash',items:[{n:'أسمنت',u:'شكارة',q:10,pr:95,r:0}],s:950,d:0,v:0,fee:0,tot:950,paid:950},v=$('#tpv');if(!v)return;v.innerHTML='';const c=rcv(i,db.tpl.paper);c.style.maxWidth='100%';v.appendChild(c)}
 function tpl(){db.tpl={...db.tpl,paper:val('tpa'),font:val('tpf'),head:val('tph'),terms:val('tpt'),foot:val('tpb')};save();pvw()}
@@ -265,9 +265,82 @@ async function exp(){const pw=val('bpw');if(pw.length<4)return alert('اكتب �
 const z=await gz(new TextEncoder().encode(JSON.stringify(db)),CompressionStream),s=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),e=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await key(pw,s),z)),o=new Blob([s,iv,e]),name='backup_'+today()+'.bak';
 try{if(window.showDirectoryPicker){const d=await showDirectoryPicker(),f=await d.getFileHandle(name,{create:true}),w=await f.createWritable();await w.write(o);await w.close();return toast('تم الحفظ في المجلد المختار')}}catch(x){if(x.name=='AbortError')return}
 const C=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem;
-if(C){const u=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(o)});await C.writeFile({path:'مستودع_مواد_البناء/'+name,data:u,directory:'DOCUMENTS',recursive:true});return toast('تم الحفظ في Documents/مستودع_مواد_البناء')}
+if(C){const u=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(o)});await C.writeFile({path:'مخزن_اولاد_شلبه/'+name,data:u,directory:'DOCUMENTS',recursive:true});return toast('تم الحفظ في Documents/مخزن_اولاد_شلبه')}
 const a=document.createElement('a');a.href=URL.createObjectURL(o);a.download=name;a.click()}
 async function imp(f){const pw=val('bpw');if(!f||!pw)return alert('اختر الملف واكتب كلمة سر النسخة');
 try{const b=new Uint8Array(await f.arrayBuffer()),z=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(16,28)},await key(pw,b.slice(0,16)),b.slice(28)));window._rs=JSON.parse(new TextDecoder().decode(await gz(z,DecompressionStream)))}catch(e){return alert('كلمة السر خاطئة أو الملف تالف')}
 modal(`<div style="background:#fee2e2;border:2px solid #dc2626;color:#991b1b;padding:12px;border-radius:12px;font-weight:700">⚠️ تحذير هام جداً: سيتم استبدال كافة البيانات الحالية بالتطبيق بالبيانات الموجودة في الملف المسترجع، وسيؤدي هذا إلى مسح أي بيانات غير محفوظة. هل تريد الاستمرار وتأكيد الاستبدال؟</div><div class="g2" style="margin-top:10px"><button class="b r" onclick="db=_rs;save();location.reload()">نعم، متأكد وأريد الاستبدال</button><button class="b g" onclick="cl()">لا، إلغاء العملية</button></div>`)}
+/* ===== v3: مشاركة PDF + تفاصيل الوردية ===== */
+async function pdf(cv,P){const jb=Uint8Array.from(atob(cv.toDataURL('image/jpeg',.92).split(',')[1]),c=>c.charCodeAt(0)),enc=new TextEncoder(),parts=[],off=[];let len=0;
+const add=b=>{if(typeof b=='string')b=enc.encode(b);parts.push(b);len+=b.length},obj=(n,t)=>{off[n]=len;add(`${n} 0 obj\n${t}\nendobj\n`)};
+const w=P=='80'?226:P=='A5'?420:595,h=cv.height*w/cv.width,H=Math.max(h,P=='A5'?595:P=='A4'?842:0),cs=`q ${w} 0 0 ${h} 0 ${H-h} cm /I Do Q`;
+add('%PDF-1.4\n');obj(1,'<</Type/Catalog/Pages 2 0 R>>');obj(2,'<</Type/Pages/Kids[3 0 R]/Count 1>>');
+obj(3,`<</Type/Page/Parent 2 0 R/MediaBox[0 0 ${w} ${H}]/Contents 4 0 R/Resources<</XObject<</I 5 0 R>>>>>>`);obj(4,`<</Length ${cs.length}>>\nstream\n${cs}\nendstream`);
+off[5]=len;add(`5 0 obj\n<</Type/XObject/Subtype/Image/Width ${cv.width}/Height ${cv.height}/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length ${jb.length}>>\nstream\n`);add(jb);add('\nendstream\nendobj\n');
+const xr=len;let x='xref\n0 6\n0000000000 65535 f \n';for(let i=1;i<=5;i++)x+=String(off[i]).padStart(10,'0')+' 00000 n \n';add(x+`trailer\n<</Size 6/Root 1 0 R>>\nstartxref\n${xr}\n%%EOF`);
+return new Blob(parts,{type:'application/pdf'})}
+async function sharePdf(cv,name,P){const b=await pdf(cv,P||'80'),f=new File([b],name+'.pdf',{type:'application/pdf'});
+try{if(navigator.canShare&&navigator.canShare({files:[f]}))return await navigator.share({files:[f],title:name})}catch(e){if(e.name=='AbortError')return}
+const Q=window.Capacitor&&Capacitor.Plugins;
+if(Q&&Q.Share&&Q.Filesystem){try{const u=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(',')[1]);x.readAsDataURL(b)}),w=await Q.Filesystem.writeFile({path:name+'.pdf',data:u,directory:'CACHE'});return await Q.Share.share({files:[w.uri]})}catch(e){}}
+const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name+'.pdf';a.click()}
+function t2c(t){const L=t.split('\n'),c=document.createElement('canvas');c.width=576;c.height=L.length*34+40;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,576,c.height);x.fillStyle='#000';x.direction='rtl';x.textAlign='right';x.font='22px '+db.tpl.font;L.forEach((l,i)=>x.fillText(l,562,34+i*34,540));return c}
+function txt(t,body){window._tx=t+'\n'+body;modal(`<h3>${t}</h3><pre>${E(body)}</pre><button class="b n np" style="margin-top:10px" onclick="sharePdf(t2c(_tx),'تقرير','80')">📤 مشاركة PDF</button>`)}
+function showInv(id,auto){const i=db.inv.find(x=>x.id==id);
+modal(`<div id="pv" style="text-align:center;overflow:auto"></div><div class="np"><h3 style="margin-top:12px">إرجاع أصناف</h3>`+i.items.map((x,j)=>x.rsv?'':`<div class="row"><span>${E(x.n)} (متبقي ${x.q-x.r})</span><input id="rq${j}" type="number" step="any" style="width:70px;margin:0"><button class="b s r" onclick="ret(${i.id},${j})">إرجاع</button></div>`).join('')+`<div class="g2" style="margin-top:10px"><button class="b a" onclick="prn(${i.id},1)">🧾 حراري</button><button class="b n" onclick="sharePdf(rcv(db.inv.find(x=>x.id==${i.id}),db.tpl.paper),'فاتورة_${i.id}',db.tpl.paper)">📤 مشاركة PDF</button></div></div>`);
+const cv=rcv(i,db.tpl.paper);cv.style.cssText='max-width:100%;border:1px solid #ddd';$('#pv').appendChild(cv);if(auto)setTimeout(()=>prn(id),500)}
+function zrep(){const t=db.sh,I=db.inv.filter(i=>i.ts>t),c=sum(I,i=>i.paid),p=sum(db.pay.filter(x=>x.ts>t),x=>x.amt),r=sum(db.ret.filter(x=>x.ts>t&&x.t=='cash'),x=>x.amt),t1=Date.now();db.sh=t1;save();window._z=[t,t1];
+modal(`<h3>تقرير إغلاق الوردية</h3><pre>${E(`${db.shop.n}\n${new Date().toLocaleString('ar-EG')}\nعدد الفواتير: ${I.length}\nإجمالي المبيعات: ${m(sum(I,i=>i.tot))}\nالمحصّل في الفواتير: ${m(c)}\nدفعات العملاء: ${m(p)}\nمرتجعات نقدية: ${m(r)}\nالنقدية بالدرج: ${m(c+p-r)}`)}</pre><button class="b a" style="margin-top:10px" onclick="zdet(_z[0],_z[1])">📋 تفاصيل</button>`)}
+function zdet(t0,t1){const I=db.inv.filter(i=>i.ts>t0&&i.ts<=t1),A={},K={};
+I.forEach(i=>{const cn=i.c&&cust(i.c)?cust(i.c).n:'عملاء نقديون';i.items.forEach(x=>{const p=prod(x.pid),cat=(p&&p.cat)||'بدون تصنيف',k=x.n+'|'+x.u,g=A[cat]=A[cat]||{},a=g[k]=g[k]||{n:x.n,u:x.u,s:0,r:0,pid:x.pid};
+if(x.rsv)a.r+=x.q;else a.s+=x.q-x.r;const cc=K[cn]=K[cn]||{},kk=k+(x.rsv?'|r':'');cc[kk]=cc[kk]||{n:x.n,u:x.u,q:0,r:x.rsv};cc[kk].q+=x.q-(x.r||0)})});
+const cd='<div class="cd" style="margin:0 0 8px;padding:10px">',
+l1=Object.keys(A).map(c=>`${cd}<h3>${E(c)}</h3>`+Object.values(A[c]).map(a=>`<div class="row"><span>${E(a.n)}</span><span>مباع: <b>${m(a.s)}</b> ${E(a.u)} | محجوز: <b>${m(a.r)}</b>${prod(a.pid)&&prod(a.pid).qty-(prod(a.pid).res||0)<0?` <button class="b s r" onclick="why(${a.pid},1)">🛑</button>`:''}</span></div>`).join('')+'</div>').join('')||'<p class="mu">لا توجد حركة في هذه الوردية</p>',
+l2=Object.keys(K).map(n=>`${cd}<h3>${E(n)}</h3><div>`+Object.values(K[n]).map(v=>`${m(v.q)} ${E(v.u)} ${E(v.n)}${v.r?' (محجوز)':''}`).join(' و ')+'</div></div>').join('')||'<p class="mu">لا يوجد عملاء</p>';
+modal(`<h3>تفاصيل الوردية</h3><div class="g2"><button class="b" onclick="$('#z1').style.display='block';$('#z2').style.display='none'">المواد والكميات</button><button class="b" onclick="$('#z2').style.display='block';$('#z1').style.display='none'">العملاء</button></div><div id="z1">${l1}</div><div id="z2" style="display:none">${l2}</div>`)}
+/* ===== v4: الاسم + نسخ احتياطي/استعادة حقيقية + البيع بالسالب ===== */
+const NAME='مخزن اولاد شلبه';
+if(db.shop.n=='مستودع مواد البناء'){db.shop.n=NAME;save()}
+function toast(t,c){const e=document.createElement('div');e.textContent=t;e.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);background:'+(c||'#16a34a')+';color:#fff;padding:12px 18px;border-radius:12px;z-index:99;font-weight:700;max-width:90%;text-align:center';document.body.appendChild(e);setTimeout(()=>e.remove(),4000)}
+
+/* --- البيع بالسالب --- */
+function addC(){const p=prod(val('ps'));if(!p)return alert('أضف منتجات من المخزن أولاً');const u=p.units[val('us')],q=+val('q');if(!(q>0))return alert('أدخل كمية صحيحة');
+const inCart=sum(cart.filter(x=>x.pid==p.id),x=>x.q*x.f),after=p.qty-(p.res||0)-inCart-q*u.f;
+cart.push({pid:p.id,n:p.n,u:u.n,f:u.f,q,pr:p.price*u.f});render();if(after<0)toast('تنبيه: الكمية أكبر من المتاح — سيصبح الرصيد '+m(after)+' بالسالب','#d97706')}
+function why(pid,back){const p=prod(pid),res=p.res||0,a=p.qty-res,u=E(p.units[0].n),l=db.rsv.filter(r=>r.pid==pid&&r.q>r.drawn),
+iv=db.inv.filter(i=>i.items.some(x=>x.pid==pid&&!x.rsv)).slice(-5).reverse();
+modal(`<h3>🛑 تفاصيل الرصيد السالب — ${E(p.n)}</h3>
+<div class="row"><span>الكمية الفعلية بالمخزن</span><b>${m(p.qty)} ${u}</b></div>
+<div class="row"><span>إجمالي المحجوز</span><b>${m(res)} ${u}</b></div>
+<div class="row"><span>المتاح (بالسالب)</span><b class="low">${m(a)} ${u}</b></div>
+<div class="row"><span>العجز المطلوب توفيره</span><b class="low">${m(-a)} ${u}</b></div>
+<p>الكمية بالسالب (${m(a)} ${u} ${E(p.n)}) نتيجة حجوزات معلقة وفواتير بيع تجاوزت الرصيد. الحجوزات المعلقة للعملاء:</p>
+<div style="overflow:auto"><table style="width:100%;font-size:12px;text-align:right"><tr><th>العميل</th><th>المتبقي</th><th>المسحوب</th><th>الانتهاء</th><th>فاتورة</th></tr>${l.map(r=>`<tr><td>${E(cust(r.c).n)}</td><td>${m(r.q-r.drawn)}</td><td>${m(r.drawn)}</td><td>${r.exp}</td><td>#${r.inv}</td></tr>`).join('')||'<tr><td colspan="5">لا توجد حجوزات معلقة — السالب ناتج عن مبيعات تجاوزت الرصيد</td></tr>'}</table></div>
+<p class="mu">آخر فواتير البيع لهذه المادة:</p>${iv.map(i=>`<div class="row"><span>#${i.id} — ${i.day} — ${E(i.c&&cust(i.c)?cust(i.c).n:'نقدي')}</span><b>${m(sum(i.items.filter(x=>x.pid==pid&&!x.rsv),x=>x.q))}</b></div>`).join('')||'<p class="mu">لا توجد</p>'}
+${back?'<button class="b g" onclick="zdet(_z[0],_z[1])">رجوع للتفاصيل</button>':''}`)}
+
+/* --- النسخ الاحتياطي (كامل، بدون كلمة سر) --- */
+function snap(day){return{app:'awlad-shalaba',v:2,day,at:Date.now(),db}}
+async function backup(day,manual){const j=JSON.stringify(snap(day));try{L.setItem('bk_'+day,j)}catch(e){}
+Object.keys(L).filter(k=>k.startsWith('bk_')).sort().reverse().slice(3).forEach(k=>L.removeItem(k));
+const r=await toFile(day,j);if(!r&&manual){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.download='backup_'+day+'.json';a.click()}return r}
+async function exp(){const t=new Date(),d=today(),name=`نسخة احتياطية ${d} ${String(t.getHours()).padStart(2,'0')}-${String(t.getMinutes()).padStart(2,'0')}.json`,j=JSON.stringify({app:'awlad-shalaba',v:2,day:d,at:Date.now(),db}),Q=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem;
+if(Q){try{try{await Q.requestPermissions()}catch(e){}await Q.writeFile({path:name,data:j,directory:'DOCUMENTS',encoding:'utf8'});await Q.stat({path:name,directory:'DOCUMENTS'});return toast('تم حفظ «'+name+'» في مجلد المستندات')}catch(e){toast('تعذر الحفظ في المستندات، تم تنزيل الملف بدلاً منه','#d97706')}}
+else if(window.showDirectoryPicker){try{const dr=await showDirectoryPicker(),f=await dr.getFileHandle(name,{create:true}),w=await f.createWritable();await w.write(j);await w.close();return toast('تم حفظ النسخة في المجلد المختار')}catch(e){if(e.name=='AbortError')return}}
+const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.download=name;a.click()}
+
+/* --- الاستعادة الحقيقية --- */
+function chkDb(o){const d=o&&o.db?o.db:o;if(!d||typeof d!='object')return null;for(const k of['prods','cust','sup','inv','pay','ret'])if(!Array.isArray(d[k]))return null;if(typeof d.u!='string'||typeof d.p!='string'||!d.shop||typeof d.shop!='object')return null;return d}
+async function imp(f){if(!f)return;const t=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.onerror=()=>r(null);x.readAsText(f)});let o;try{o=JSON.parse(t)}catch(e){return alert('الملف غير صالح أو تالف — لم يتم تغيير أي بيانات')}askRestore(o,f.name)}
+function impKey(k){let o;try{o=JSON.parse(L.getItem(k))}catch(e){return alert('النسخة غير صالحة')}askRestore(o,k.slice(3))}
+function askRestore(o,name){const d=chkDb(o);if(!d)return alert('هذا الملف ليس نسخة احتياطية كاملة لهذا التطبيق — لم يتم تغيير أي بيانات');window._rs=d;
+modal(`<div style="background:#fee2e2;border:2px solid #dc2626;color:#991b1b;padding:12px;border-radius:12px;font-weight:700">⚠️ سيتم تبديل البيانات كاملة: كل البيانات الحالية (المنتجات، العملاء، الفواتير، الحجوزات، الإعدادات) ستُستبدل ببيانات النسخة «${E(name)}» ولا يمكن التراجع.</div><div class="row"><span>منتجات النسخة</span><b>${d.prods.length}</b></div><div class="row"><span>عملاء النسخة</span><b>${d.cust.length}</b></div><div class="row"><span>فواتير النسخة</span><b>${d.inv.length}</b></div><div class="g2" style="margin-top:10px"><button class="b r" onclick="doRestore()">موافق — استبدال كل البيانات</button><button class="b g" onclick="cl()">إلغاء</button></div>`)}
+function doRestore(){const d=_rs,nd={t:'dark',hold:[],rsv:[],seq:1,sh:0,...d};nd.shop={n:NAME,ph:'',vat:0,low:10,...d.shop};nd.tpl=d.tpl||{paper:'80',font:'Tahoma',head:'',foot:'شكراً لتعاملكم معنا',terms:'',logo:''};nd.lastBk=today();
+['hold','rsv'].forEach(k=>{if(!Array.isArray(nd[k]))nd[k]=[]});let mx=0;[nd.prods,nd.cust,nd.sup,nd.inv,nd.pay,nd.ret,nd.rsv].forEach(a=>a.forEach(x=>{mx=Math.max(mx,+x.id||0)}));nd.seq=Math.max(+nd.seq||1,mx+1);
+const s=JSON.stringify(nd);let prev=0;try{L.setItem('db_prev',L.getItem('db'));prev=1}catch(e){}
+try{L.setItem('db',s)}catch(e){if(prev)L.removeItem('db_prev');return alert('تعذّرت الاستعادة بسبب مساحة التخزين. لم يتم تغيير أي بيانات')}
+db=nd;ok=0;alert('✅ تمت الاستعادة بنجاح. سيُعاد تشغيل البرنامج، سجّل الدخول ببيانات النسخة المستعادة');location.reload()}
+function vRes(){const ks=Object.keys(L).filter(k=>k.startsWith('bk_')&&(L.getItem(k)||'').includes('"app":"awlad-shalaba"')).sort().reverse();
+return card('♻️ استعادة نسخة احتياطية',`<div class="ro" style="background:#fee2e2;border-color:#dc2626;color:#991b1b">⚠️ الاستعادة تستبدل كل بيانات التطبيق ببيانات النسخة المختارة.</div><button class="b a" onclick="$('#rf3').click()">📂 اختيار ملف نسخة احتياطية</button><input id="rf3" type="file" style="display:none" onchange="imp(this.files[0]);this.value=''">`)
++card('🗂️ النسخ التلقائية داخل التطبيق',ks.map(k=>`<div class="row"><span>${k.slice(3)}</span><button class="b s a" onclick="impKey('${k}')">استعادة</button></div>`).join('')||'<p class="mu">لا توجد نسخ تلقائية بعد (تُنشأ كل يوم الساعة 12 ليلاً)</p>')}
 </script></body></html>
