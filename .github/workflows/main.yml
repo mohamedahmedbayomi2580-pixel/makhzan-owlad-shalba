@@ -25,6 +25,9 @@ jobs:
           mkdir -p www
           [ -f building-store.html ] && cp building-store.html www/index.html
           test -f www/index.html || { echo "ERROR: www/index.html not found"; exit 1; }
+          test -f core.js || { echo "ERROR: core.js not found in repo root"; exit 1; }
+          cp core.js www/core.js
+          grep -q 'src="core.js"' www/index.html || sed -i 's#</body>#<script src="core.js"></script></body>#' www/index.html
       - name: Add Android platform
         run: '[ -d android ] || npx cap add android'
       - name: Add permissions
