@@ -25,9 +25,6 @@ jobs:
           mkdir -p www
           [ -f building-store.html ] && cp building-store.html www/index.html
           test -f www/index.html || { echo "ERROR: www/index.html not found"; exit 1; }
-          test -f core.js || { echo "ERROR: core.js not found in repo root"; exit 1; }
-          cp core.js www/core.js
-          grep -q 'src="core.js"' www/index.html || sed -i 's#</body>#<script src="core.js"></script></body>#' www/index.html
       - name: Add Android platform
         run: '[ -d android ] || npx cap add android'
       - name: Add permissions
@@ -35,6 +32,31 @@ jobs:
           M=android/app/src/main/AndroidManifest.xml
           grep -q POST_NOTIFICATIONS $M || sed -i 's#<application#<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>\n    <application#' $M
           grep -q requestLegacyExternalStorage $M || sed -i 's#<application#<application android:requestLegacyExternalStorage="true"#' $M
+      - name: Apply app icon
+        run: |
+          ICON=""
+          for f in assets/icon-only.png assets/icon.png resources/icon.png icon.png; do
+            if [ -f "$f" ]; then ICON="$f"; break; fi
+          done
+          if [ -z "$ICON" ]; then echo "No icon file found - default icon will be used"; exit 0; fi
+          sudo apt-get install -y imagemagick > /dev/null
+          R=android/app/src/main/res
+          rm -rf $R/mipmap-anydpi-v26
+          for s in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            d=${s%%:*}; z=${s##*:}
+            mkdir -p $R/mipmap-$d
+            convert "$ICON" -resize ${z}x${z} $R/mipmap-$d/ic_launcher.png
+            cp $R/mipmap-$d/ic_launcher.png $R/mipmap-$d/ic_launcher_round.png
+          done
+      - name: Fixed signing key
+        run: |
+          mkdir -p ~/.android
+          if [ -f debug.keystore ]; then cp debug.keystore ~/.android/debug.keystore; else echo "WARNING: debug.keystore missing - APK signature changes every build"; fi
+      - name: Bump version
+        run: |
+          G=android/app/build.gradle
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" $G
+          sed -i "s/versionName \"[^\"]*\"/versionName \"2.${{ github.run_number }}\"/" $G
       - name: Sync
         run: npx cap sync android
       - name: Build debug APK
