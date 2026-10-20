@@ -25,6 +25,51 @@ jobs:
           mkdir -p www
           [ -f building-store.html ] && cp building-store.html www/index.html
           test -f www/index.html || { echo "ERROR: www/index.html not found"; exit 1; }
+      - name: Patch app (fix freeze + unlimited storage)
+        run: |
+          python3 - <<'PY'
+          p='www/index.html'
+          s=open(p,encoding='utf-8').read()
+          def rep(a,b):
+              global s
+              assert a in s, 'NOT FOUND: '+a[:40]
+              s=s.replace(a,b,1)
+          # 1) main script becomes inert text, started after IndexedDB loads
+          rep('<script>','<script type="text/plain" id="main">')
+          # 2) old WebView fix
+          rep("String(s??'')","String(s==null?'':s)")
+          # 3) IndexedDB storage (no 5MB limit)
+          rep("let db=JSON.parse(","let db=window.__DB||JSON.parse(")
+          rep("const save=()=>{const s=JSON.stringify(db);","const save=()=>{if(IDB){try{IDB.transaction('kv','readwrite').objectStore('kv').put(db,'db');return}catch(e){}}const s=JSON.stringify(db);")
+          override="""
+          doRestore=function(){const d=_rs,nd={t:'dark',hold:[],rsv:[],seq:1,sh:0,...d};nd.shop={n:NAME,ph:'',vat:0,low:10,...d.shop};nd.tpl=d.tpl||{paper:'80',font:'Tahoma',head:'',foot:'',terms:'',logo:''};nd.lastBk=today();
+          ['hold','rsv'].forEach(k=>{if(!Array.isArray(nd[k]))nd[k]=[]});let mx=0;[nd.prods,nd.cust,nd.sup,nd.inv,nd.pay,nd.ret,nd.rsv].forEach(a=>a.forEach(x=>{mx=Math.max(mx,+x.id||0)}));nd.seq=Math.max(+nd.seq||1,mx+1);
+          const tx=IDB.transaction('kv','readwrite');tx.objectStore('kv').put(nd,'db');
+          tx.oncomplete=()=>{db=nd;ok=0;alert('تمت الاستعادة بنجاح');location.reload()};tx.onerror=()=>alert('تعذرت الاستعادة')};
+          """
+          loader="""
+          <script>
+          var IDB=null;
+          (function(){
+           function boot(){var x=document.createElement('script');x.textContent=document.getElementById('main').textContent;document.body.appendChild(x)}
+           try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+           try{
+            var r=indexedDB.open('shalaba',1);
+            r.onupgradeneeded=function(){r.result.createObjectStore('kv')};
+            r.onsuccess=function(){IDB=r.result;var g=IDB.transaction('kv').objectStore('kv').get('db');
+             g.onsuccess=function(){window.__DB=g.result||null;boot()};g.onerror=boot};
+            r.onerror=boot;
+           }catch(e){boot()}
+          })();
+          </script>
+          """
+          i=s.rindex('</script>')
+          s=s[:i]+override+'</script>'+loader+s[i+9:]
+          # 4) on-screen error catcher
+          catcher="""<script>addEventListener('error',function(e){var d=document.createElement('pre');d.style.cssText='position:fixed;z-index:99999;top:20px;left:8px;right:8px;background:#7f1d1d;color:#fff;padding:10px;font:12px monospace;white-space:pre-wrap;direction:ltr';d.textContent='ERR: '+e.message+' line '+e.lineno;document.body.appendChild(d)});</script>"""
+          rep('<body>','<body>'+catcher)
+          open(p,'w',encoding='utf-8').write(s)
+          PY
       - name: Add Android platform
         run: '[ -d android ] || npx cap add android'
       - name: Add permissions
@@ -36,6 +81,10 @@ jobs:
         run: |
           M=android/app/src/main/AndroidManifest.xml
           grep -q permission.CAMERA $M || sed -i 's#<application#<uses-permission android:name="android.permission.CAMERA"/>\n    <uses-feature android:name="android.hardware.camera" android:required="false"/>\n    <application#' $M
+      - name: Large heap
+        run: |
+          M=android/app/src/main/AndroidManifest.xml
+          grep -q largeHeap $M || sed -i 's#<application#<application android:largeHeap="true"#' $M
       - name: Apply app icon
         run: |
           ICON=""
