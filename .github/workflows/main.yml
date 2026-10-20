@@ -31,12 +31,22 @@ jobs:
           import re
           p='www/index.html'
           s=open(p,encoding='utf-8').read()
+          print('LENGTH:',len(s),'| has </script>:','</script>' in s)
           def rep(a,b):
               global s
               if a in s:
                   s=s.replace(a,b,1); print('OK   :',a[:40])
               else:
                   print('SKIP :',a[:40])
+          # salvage a truncated file: cut the incomplete last function
+          truncated = '</script>' not in s
+          if truncated:
+              idx=s.rfind('/* --- كشف حساب العميل')
+              if idx<0: idx=s.rfind('\nfunction ledger(')
+              if idx>0:
+                  s=s[:idx]; print('WARN : file was truncated, cut at',idx)
+              else:
+                  print('ERROR: truncated and cannot salvage'); raise SystemExit(1)
           rep('<script>','<script type="text/plain" id="main">')
           rep("String(s??'')","String(s==null?'':s)")
           rep("let db=JSON.parse(","let db=window.__DB||JSON.parse(")
@@ -45,11 +55,7 @@ jobs:
           if m:
               s=s[:m.start()]+new_save+"\n"+s[m.end():]; print('OK   : save replaced')
           else:
-              m=re.search(r"const save=.*?\n",s)
-              if m:
-                  s=s[:m.start()]+new_save+"\n"+s[m.end():]; print('OK   : save replaced (line)')
-              else:
-                  print('SKIP : save not found')
+              print('SKIP : save not found')
           override="""
           doRestore=function(){const d=_rs,nd={t:'dark',hold:[],rsv:[],seq:1,sh:0,...d};nd.shop={n:NAME,ph:'',vat:0,low:10,...d.shop};nd.tpl=d.tpl||{paper:'80',font:'Tahoma',head:'',foot:'',terms:'',logo:''};nd.lastBk=today();
           ['hold','rsv'].forEach(k=>{if(!Array.isArray(nd[k]))nd[k]=[]});let mx=0;[nd.prods,nd.cust,nd.sup,nd.inv,nd.pay,nd.ret,nd.rsv].forEach(a=>a.forEach(x=>{mx=Math.max(mx,+x.id||0)}));nd.seq=Math.max(+nd.seq||1,mx+1);
@@ -72,8 +78,11 @@ jobs:
           })();
           </script>
           """
-          i=s.rindex('</script>')
-          s=s[:i]+override+'</script>'+loader+s[i+9:]
+          if truncated:
+              s=s+"\n"+override+"</script>"+loader+"</body></html>"
+          else:
+              i=s.rindex('</script>')
+              s=s[:i]+override+'</script>'+loader+s[i+9:]
           catcher="""<script>addEventListener('error',function(e){var d=document.createElement('pre');d.style.cssText='position:fixed;z-index:99999;top:20px;left:8px;right:8px;background:#7f1d1d;color:#fff;padding:10px;font:12px monospace;white-space:pre-wrap;direction:ltr';d.textContent='ERR: '+e.message+' line '+e.lineno;document.body.appendChild(d)});</script>"""
           rep('<body>','<body>'+catcher)
           open(p,'w',encoding='utf-8').write(s)
