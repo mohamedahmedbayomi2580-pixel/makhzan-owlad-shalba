@@ -119,7 +119,7 @@ return card('🛒 إضافة صنف',`<select id="ps" onchange="uo()">${op}</sel
 <input type="number" min="0" placeholder="الخصم (مبلغ ثابت)" value="${cf.dv||''}" onchange="cf.dv=+this.value;cf.dt='f';upd()">
 <div class="g2"><input type="number" placeholder="أجرة النقل والعتالة" value="${cf.fee||''}" onchange="cf.fee=+this.value;upd()"><input type="number" placeholder="المدفوع (للآجل)" value="${cf.pd||''}" onchange="cf.pd=+this.value"></div>
 <input placeholder="موقع البناء" value="${E(cf.site)}" onchange="cf.site=this.value"><div class="mu">تاريخ السداد المخطط (للآجل)</div><input type="date" value="${cf.due||''}" onchange="cf.due=this.value">
-<input type="tel" placeholder="رقم هاتف العميل (إلزامي)" value="${E(cf.ph||'')}" onchange="cf.ph=this.value"><select onchange="cf.m=this.value"><option value="cash">الدفع: كاش</option><option value="visa" ${cf.m=='visa'?'selected':''}>فيزا</option><option value="net" ${cf.m=='net'?'selected':''}>الشبكة الإلكترونية</option><option value="wallet" ${cf.m=='wallet'?'selected':''}>محفظة رقمية</option></select><button class="b n" onclick="fin()" style="padding:15px;font-size:16px">✅ إنشاء فاتورة / تأكيد البيع</button>
+<input type="tel" placeholder="رقم هاتف العميل (اختياري)" value="${E(cf.ph||'')}" onchange="cf.ph=this.value"><select onchange="cf.m=this.value"><option value="cash">الدفع: كاش</option><option value="visa" ${cf.m=='visa'?'selected':''}>فيزا</option><option value="net" ${cf.m=='net'?'selected':''}>الشبكة الإلكترونية</option><option value="wallet" ${cf.m=='wallet'?'selected':''}>محفظة رقمية</option></select><button class="b n" onclick="fin()" style="padding:15px;font-size:16px">✅ إنشاء فاتورة / تأكيد البيع</button>
 <div class="g2"><button class="b a" onclick="hold()">⏸ تعليق الفاتورة</button><button class="b g" onclick="showHold()">المعلّقة (${db.hold.length})</button></div>`)}
 function uo(){const p=prod(val('ps')||0),s=$('#us');if(s)s.innerHTML=p?p.units.map((u,i)=>`<option value="${i}">${E(u.n)} — ${m(p.price*u.f)}</option>`).join(''):''}
 function calc(){const s=sum(cart,x=>x.q*x.pr),d=cf.dt=='p'?s*cf.dv/100:+cf.dv||0,v=(s-d)*(db.shop.vat||0)/100;return{s,d,v,t:s-d+v+(+cf.fee||0)}}
@@ -401,7 +401,7 @@ function delMat(k){const p=mp(k);if(db.rsv.some(r=>r.pid==p.id&&r.q>r.drawn))ret
 /* --- الفاتورة (تحقق + تكلفة سرية + هاتف + وسيلة دفع) --- */
 function fin(){if(!cart.length)return alert('الفاتورة فارغة');const k=calc(),c=cust(cf.c),ph=(cf.ph||'').trim(),pd=+cf.pd||0,fee=+cf.fee||0;
 if(cf.t=='credit'&&!c)return alert('اختر العميل للفاتورة الآجلة');
-if(!/^[0-9+\s-]{7,}$/.test(ph))return alert('رقم هاتف العميل إلزامي');
+if(ph&&!/^[0-9+\s-]{7,}$/.test(ph))return alert('أدخل رقم هاتف صحيحاً أو اتركه فارغاً');
 if(+cf.dv<0||fee<0||pd<0||cart.some(x=>x.pr<0||x.q<=0))return alert('لا يُسمح بقيم سالبة');
 if(k.d>k.s)return alert('الخصم أكبر من مجموع المواد');
 if(cf.t=='credit'&&pd>k.t)return alert('المدفوع أكبر من إجمالي الفاتورة');
